@@ -1,9 +1,20 @@
-# Fetch the latest Ubuntu 22.04 LTS AMI
+#############################################
+# Default VPC
+#############################################
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+#############################################
+# Fetch Latest Ubuntu 24.04 LTS AMI
+#############################################
 
 data "aws_ami" "ubuntu" {
   most_recent = true
 
-  owners = ["099720109477"] # Canonical Official AWS Account
+  # Canonical Official AWS Account
+  owners = ["099720109477"]
 
   filter {
     name   = "name"
@@ -21,12 +32,15 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# Create EC2 Instance
+#############################################
+# EC2 Instance
+#############################################
 
 resource "aws_instance" "web_server" {
 
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   tags = {
     Name        = "terraform-ubuntu-server"
